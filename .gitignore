@@ -1,0 +1,8 @@
+*.pyc
+*.caffemodel
+.ipynb_checkpoints
+output/
+.DS_Store
+._.DS_Store
+*.out
+tools_assist/
