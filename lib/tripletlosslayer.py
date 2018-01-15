@@ -7,6 +7,7 @@
 import caffe
 import numpy as np
 import yaml
+import config
 
 
 class TripletLayer(caffe.Layer):
@@ -45,7 +46,7 @@ class TripletLayer(caffe.Layer):
     
     def backward(self, top, propagate_down, bottom):
         if propagate_down[0]:
-            diff = np.zeros_like(bottom[0].data.shape, dtype=np.float32)
+            diff = np.zeros_like(bottom[0].data, dtype=np.float32)
 
             a_batch = bottom[0].data[:self.triplet]
             p_batch = bottom[0].data[self.triplet:2*self.triplet]
@@ -53,11 +54,11 @@ class TripletLayer(caffe.Layer):
 
             idx = np.where(self.dist>0)[0]
             # backward for anchor
-            diff[idx] = self.a * (n_batch-p_batch) / self.triplet
+            diff[idx] = self.a * (n_batch[idx]-p_batch[idx]) / self.triplet
             # backward for positive
-            diff[idx+self.triplet] = self.a * (p_batch-a_batch) / self.triplet
+            diff[idx+self.triplet] = self.a * (p_batch[idx]-a_batch[idx]) / self.triplet
             # bakcward for negative
-            diff[idx+2*self.triplet] = self.a * (a_batch-n_batch) / self.triplet
+            diff[idx+2*self.triplet] = self.a * (a_batch[idx]-n_batch[idx]) / self.triplet
 
             bottom[0].diff[...] = diff
 
