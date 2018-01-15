@@ -5,14 +5,9 @@
 """The data layer used during training a VGG_FACE network by triplet loss.
 """
 
-
 import caffe
 import numpy as np
-from numpy import *
 import yaml
-from multiprocessing import Process, Queue
-from caffe._caffe import RawBlobVec
-from sklearn import preprocessing
 
 
 class Norm2Layer(caffe.Layer):
@@ -39,5 +34,8 @@ class Norm2Layer(caffe.Layer):
             bottom[0].diff[...] =  (top[0].diff - self.y * np.sum(top[0].diff*self.y, axis=1, keepdims=True)) / (self.x_trans_x_pow+self.pos_eps)         
 
     def reshape(self, bottom, top):
-        """Reshaping happens during the call to forward."""
-        top[0].reshape(bottom[0].num, shape(bottom[0].data)[1])
+        """Reshaping happens during the call to forward.
+        bottom[0]: n*c or n*c*1*1 --> n*c
+        """
+        bottom[0].reshape(bottom[0].data.shape[0], bottom[0].data.shape[1])
+        top[0].reshape(bottom[0].num, bottom[0].data.shape[1])
